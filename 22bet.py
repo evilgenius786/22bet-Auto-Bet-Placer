@@ -118,17 +118,7 @@ def main():
                                     print("Already placed bet on", match)
                                 else:
                                     print("All requirements satisfied, placing bet!")
-                                    try:
-
-                                        if float(tov1.text.split('\n')[1]) > tov:
-                                            clicktov(driver, tov1, "1", bet)
-                                            placebet(driver, bet, match)
-                                        if tov2 is not None and float(tov2.text.split('\n')[1]) > tov:
-                                            clicktov(driver, tov2, "3", bet)
-                                            placebet(driver, bet, match)
-                                    except:
-                                        print("Error placing bet", match)
-                                        traceback.print_exc()
+                                    loop(driver, bet, tov, 0)
                                 print("_____________________________________")
                     except:
                         print("Error on match", match)
@@ -137,6 +127,34 @@ def main():
                 print("Error on league", league)
                 traceback.print_exc()
         driver.get('https://22bet.com/live/Football/')
+
+
+def loop(driver, bet, tov, i):
+    if i > 4:
+        print("Enable to place bet", driver.current_url)
+        return
+    match = driver.current_url
+    tov1 = getElement(driver, '//div[normalize-space()="Total"]/../div[2]/div[1]')
+    tov2 = None
+    try:
+        tov2 = getElement(driver, '//div[normalize-space()="Total"]/../div[2]/div[3]')
+        print(tov2.text.split('\n'))
+    except:
+        pass
+    try:
+
+        if float(tov1.text.split('\n')[1]) > tov:
+            clicktov(driver, tov1, "1", bet)
+            placebet(driver, bet, match)
+        if tov2 is not None and float(tov2.text.split('\n')[1]) > tov:
+            clicktov(driver, tov2, "3", bet)
+            placebet(driver, bet, match)
+    except:
+        print("Error placing bet", match)
+        traceback.print_exc()
+        driver.refresh()
+        time.sleep(1)
+        loop(driver, bet, tov, i + 1)
 
 
 def clicktov(driver, tov0, div, bet):
